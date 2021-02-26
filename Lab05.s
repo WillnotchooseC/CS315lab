@@ -97,7 +97,7 @@ main:
     lw $a0, 0($t0)                   
     la $t1, array_size_p    # load the address of variable array_size into register $a1
     lw $a1, 0($t1)         
-    
+    #push to github!!!!
     jal print_array         # calling subprogram print_array
 
 mainEnd:
