@@ -54,10 +54,10 @@ main:
 # set up arguments for read_array subprogram
 #To do: Think about the logic and syntax and fix errors
 
-    la $a0, array_pointer_p # load the address of variable array_pointer into register $a0
-                            
-    la $a1, array_size_p    # load the address of variable array_size into register $a1
-                            
+    la $t0, array_pointer_p # load the address of variable array_pointer into register $a0
+    lw $a0, 0($t0)                   
+    la $t1, array_size_p    # load the address of variable array_size into register $a1
+    lw $a1, 0($t1)                        
                             
     jal read_array         # call subprogram read_array
                            # arguments IN: true address of dynamic array and array size value
@@ -67,8 +67,10 @@ main:
 # calling subprogram print_array
 #To do: Think about the logic and syntax and fix errors
     
-    la $a0, array_pointer_p # load the address of variable array_pointer into register $a0
-    la $a1, array_size_p    # load the address of variable array_size into register $a1
+    la $t0, array_pointer_p # load the address of variable array_pointer into register $a0
+    lw $a0, 0($t0)                   
+    la $t1, array_size_p    # load the address of variable array_size into register $a1
+    lw $a1, 0($t1)         
     
     jal print_array         # calling subprogram print_array
 
@@ -80,8 +82,10 @@ main:
 # calling subprogram sort_array 
 #To do: Think about the logic and syntax and fix errors
 
-    la $a0, array_pointer_p # load the address of variable array_pointer into register $a0
-    la $a1, array_size_p    # load the address of variable array_size into register $a1
+    la $t0, array_pointer_p # load the address of variable array_pointer into register $a0
+    lw $a0, 0($t0)                   
+    la $t1, array_size_p    # load the address of variable array_size into register $a1
+    lw $a1, 0($t1)         
     
     jal sort_array          # calling subprogram sort_array 
 
@@ -89,13 +93,15 @@ main:
 # calling subprogram print_array 
 #To do: Think about the logic and syntax and fix error
    
-    la $a0, array_pointer_p # load the address of variable array_pointer into register $a0
-    la $a1, array_size_p    # load the address of variable array_size into register $a1
+    la $t0, array_pointer_p # load the address of variable array_pointer into register $a0
+    lw $a0, 0($t0)                   
+    la $t1, array_size_p    # load the address of variable array_size into register $a1
+    lw $a1, 0($t1)         
     
     jal print_array         # calling subprogram print_array
 
 mainEnd:
-    li $v0, 4
+    li $v0, 10
     syscall                 # Halt
 ###########################################################
 #       Arguments IN and OUT of subprogram
@@ -200,35 +206,36 @@ read_array:
 # save arguments so we do not lose them
 #To do: Think about syntax, logic, and fix errors
 
-    move $t1, $a0               # move array pointer (address) to $t0
-    move $t0, $a1               # move array size (value) to $t1
+    move $t0, $a0               # move array pointer (address) to $t0
+    move $t1, $a1               # move array size (value) to $t1
     
 read_array_loop:
 #To do: Think about logic and fix error
 
-    bge $t1, read_array_end    # branch to read_array_end if counter is less than or equal to zero
+    blez $t1, read_array_end    # branch to read_array_end if counter is less than or equal to zero
 
 #To do: Think about syntax and fix error   
-    li $v0, 5                   # prompt array element
+    li $v0, 4                   # prompt array element
     la $a0, read_array_prompt_p
     syscall
 
 #To do: Think about syntax and fix error   
-    li $v0, 4                   # reads integer
+    li $v0, 5                   # reads integer
     syscall
 
 #To do: Think about logic and syntax and fix errors    
-    sw $a0, 4($t0)              # memory[$t0 + 0] <-- $v0
+    sw $v0, 0($t0)              # memory[$t0 + 0] <-- $v0
                                 # store a value that is in register $v0 into memory
 
 #To do: Think about syntax and fix error    
-    addi $t0, $t0, 6            # increment array pointer (address) to next word (each word is 4 bytes)
+    addi $t0, $t0, 4            # increment array pointer (address) to next word (each word is 4 bytes)
     addi $t1, $t1, -1           # decrement array counter (index)
     
     b read_array_loop           # branch unconditionally back to beginning of the loop
     
 read_array_end:
 
+    jr $ra
 #To do: Think about syntax, comments and fix errors
 
 ###########################################################
@@ -365,8 +372,8 @@ print_array:
 # save arguments so we do not lose them
 #To do: Think about syntax and fix errors
 
-    move $t1, $a0               # move array pointer (address) to $t0
-    move $t0, $a1               # move array size (value) to $t1
+    move $t0, $a0               # move array pointer (address) to $t0
+    move $t1, $a1               # move array size (value) to $t1
     
     li $v0, 4                   # prints array is:
     la $a0, print_array_array_p
@@ -375,12 +382,12 @@ print_array:
 print_array_while:
 #To do: Think about logic and fix errors
 
-    blt $t9, print_array_end   # branch to print_array_end if counter is less than or equal to zero
+    blez $t1, print_array_end   # branch to print_array_end if counter is less than or equal to zero
     
 # print value from array
 #To do: Think about logic, syntax, and fix errors
-    li $v0, 4
-    sw $a0, 0($t0)              # $a0 <-- memory[$t0 + 0]
+    li $v0, 1
+    lw $a0, 0($t0)              # $a0 <-- memory[$t0 + 0]
                                 # load a value from memory to register $a0
     syscall
     
@@ -389,13 +396,14 @@ print_array_while:
     syscall 
 
 #To do: Think about logic and fix errors   
-    addi $t0, $t0, 8            # increment array pointer (address) to next word (each word is 4 bytes)
+    addi $t0, $t0, 4            # increment array pointer (address) to next word (each word is 4 bytes)
     addi $t1, $t1, -1           # decrement array counter (index)
 
 #To do: Think about logic, syntax, comments and fix errors    
-    b print_array               # branch unconditionally back to beginning of the loop
+    b print_array_while               # branch unconditionally back to beginning of the loop
     
 print_array_end:
+    jr $ra
 
 #To do: Think about syntax, comments, and fix errors
 ########################################################### 
