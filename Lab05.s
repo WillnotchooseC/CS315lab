@@ -124,8 +124,8 @@ allocate_array:
 # save arguments so we do not lose them
 #To do: Think about the logic and syntax and fix errors
 
-    move $t1, $a0               # move array pointer (address) to $t0
-    move $t0, $a1               # move array size pointer (address) to $t1
+    move $t0, $a0               # move array pointer (address) to $t0
+    move $t1, $a1               # move array size pointer (address) to $t1
     
 allocate_array_loop:
     li $v0, 4                   # prompt for array size
@@ -134,21 +134,21 @@ allocate_array_loop:
  
 #To do: Think about syntax and fix error
    
-    li $v0, 6                   # reads integer for array size
+    li $v0, 5                   # reads integer for array size
     syscall
 
 #To do: Think about logic and fix error
-    bgez $v0, allocate_array_invalid_size   # branch to error section as array size is
+    blez $v0, allocate_array_invalid_size   # branch to error section as array size is
                                             # less than or equal to zero
     
     move $t2, $v0               # store valid array size in register $t2
 
 #To do: Think about syntax and fix error    
-    li $v0, 5                   # dynamically allocate an array (using system call 9)
+    li $v0, 9                   # dynamically allocate an array (using system call 9)
     move $a0, $t2               # puts array size in register $a0
 
 #To do: Think about logic and fix error
-    sll $a0, $a0, 3             # multiply array size by 4, as word in MIPS is 4 bytes
+    sll $a0, $a0, 2             # multiply array size by 4, as word in MIPS is 4 bytes
     syscall
 
     b allocate_array_end        # branch unconditionally to the end of subprogram
@@ -164,7 +164,7 @@ allocate_array_end:
     sw $v0, 0($t0)              # store address of dynamic array in static variable (array_pointer)
 
 #To do: Think about logic and fix error
-    sw $t2, 4($t1)              # store size of dynamic array in static variable (array_size)
+    sw $t2, 0($t1)              # store size of dynamic array in static variable (array_size)
 
     jr $ra                      # jump back to the main
 ###########################################################
