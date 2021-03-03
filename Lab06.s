@@ -44,13 +44,29 @@ main:
 	la $t1, length                		# $t1 <- address of static variable "length"
 	sw $v1, 0($t1)                      # mem[length] <- array length
 
-	lw $a0, 0($t0)                      # $a0 <- base addresss
-	lw $a1, 0($t1)                      # $a1 <- array length
+	#lw $a0, 0($t0)                      # $a0 <- base addresss
+	#lw $a1, 0($t1)                      # $a1 <- array length
+
+    addi $sp, $sp, -4				# $sp <- $sp - 4 (1 word)
+	sw $ra, 0($sp)					# stack <- $ra (backup)
+
+ 	addi $sp, $sp, -12				# $sp <- $sp -12 (3 words: Two IN, One OUT)
+	sw $t0, 0($sp)					# stack[0] <- base address (IN)
+	sw $t1, 4($sp)					# stack[4] <- array length (IN)
 
 	jal read_values                     # call read_values
 
-	la $t1, sum					 		# $t1 <- address of static variable "sum"
-	sw $v0, 0($t1)                      # mem[sum] <- sum of array
+	#la $t1, sum					 		# $t1 <- address of static variable "sum"
+	#sw $v0, 0($t1)                      # mem[sum] <- sum of array
+
+	lw $t2, 8($sp)					# $t2 <- sum (OUT)
+	addi $sp, $sp, 12				# $sp <- $sp + 12 (3 words)
+
+	lw $ra, 0($sp)					# $ra <- return address (restore)
+	addi $sp, $sp, 4				# $sp <- $sp + 4 (1 word)
+
+	la $t9, sum					# $t9 <- address of sum_var
+	sw $t2, 0($t9)					# sum_var <- sum
 
 	li $v0, 4                           # $v0 <- 4 (setup syscall to print string)
 	la $a0, sum_p						# $a0 <- address of static vairiable "sum_p:
@@ -185,8 +201,12 @@ read_values_invalid_p:      .asciiz "Invalid Entry. Try Again\n"
 		.text
 read_values:
 
-	move $t0, $a0                       # $t0 <- array base address (pointer)
-	move $t1, $a1						# $t1 <- array size (counter)
+	#move $t0, $a0                       # $t0 <- array base address (pointer)
+	#move $t1, $a1						# $t1 <- array size (counter)
+
+	lw $t0, 0($sp)						# $t0 <- base address (IN)
+	lw $t1, 4($sp)						# $t1 <- array length (IN)
+
 	li $t2, 2							# $t2 <- 2
 	li $t3, 3							# $t3 <- 3
 	li $t4, 0							# $t4 <- 0 (initialize sum)
@@ -227,7 +247,8 @@ read_values_invalid_entry:
 
 read_values_end:
 
-	move $v0, $t4                   	# $v0 <- sum of array
+	#move $v0, $t4                   	# $v0 <- sum of array
+	sw $t4, 8($sp)						# stack[8] <- sum (OUT)
 	jr $ra	                            # return to calling location.   
 
 ###########################################################
